@@ -36,7 +36,9 @@ export default function App(){
   }
 
   function handleSelection(friend){
-    selectedFriend(friend);
+    // selectedFriend(friend);
+    setSelectedFriend(cur => cur?.id === friend.id ? null : friend);
+    setShowAddFriend(false);
   }
 
   return <div className="app">
@@ -69,8 +71,10 @@ function FriendsList({ friends, onSelection, selectedFriend }) {
   </ul>
 }
 
-function Friend({friend, onSelection}){
-  return <li>
+function Friend({friend, onSelection, selectedFriend}){
+  const isSelected = selectedFriend?.id === friend.id
+
+  return <li className={isSelected ? "selected" : ""}>
     <img src={friend.img} alt={friend.name}/>
     <h3>{friend.name}</h3>
 
@@ -89,7 +93,7 @@ function Friend({friend, onSelection}){
         <p> You and {friend.name} are even.</p>
       )
     }
-    <Button onClick={() => onSelection(friend)}>Select</Button>
+    <Button onClick={() => onSelection(friend)}>{isSelected ? "Close" : "Select"}</Button>
   </li>
 }
 
@@ -141,20 +145,27 @@ function FormAddFriend({onAddFriend}){
 }
 
 function FormSplitBill({selectedFriend}){
+  const [bill, setBill] = useState("");
+  const [paidByUSer, setPaidByUser] = useState("");
+  const [whoIsPaying, setWhoIsPaying] = useState("user");
+
   return <form className="form-split-bill">
     <h2>Split a bill with {selectedFriend.name}</h2>
 
     <lable>💲Bill value</lable>
-    <input type="text"/>
+    <input type="text" value={bill} onChange={(e) => setBill(e.target.value)}/>
 
     <lable>Your Expense</lable>
-    <input type="text"/>
+    <input type="text" value={paidByUSer} onChange={(e) => setPaidByUser(e.target.value)}/>
 
     <lable> {selectedFriend.name}'s Expense</lable>
     <input type="text"/>
 
     <lable>Who is paying the bill?</lable>
-    <select>
+    <select
+      value={whoIsPaying}
+      onChange={(e) => setWhoIsPaying(e.target.value)}
+    >
       <option value="user">You</option>
       <option value="friend">{selectedFriend.name}</option>
     </select>
